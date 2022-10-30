@@ -107,7 +107,3 @@ class testDataset(Dataset):
         lrImgObj = self.lr_transform(hrImgObj)
         srImgObj = self.sr_transform(lrImgObj)
         return self.to_tensor(lrImgObj), self.to_tensor(srImgObj), self.to_tensor(hrImgObj)
-        
-        
-        
-        
