@@ -27,9 +27,16 @@ def openImage(filepath):
         return imgObj
     except:
         raise ValueError()
+    
+def getAverage(List:list):
+    length = len(List)
+    summation = 0.
+    for item in List:
+        summation += item
+    return summation / length
 
 class trainDataset(Dataset):
-    def __init__(self, root:str, lr_size:tuple=(360, 640), hr_size:tuple=(1080, 1920)) -> None:
+    def __init__(self, root:str, lr_size:tuple=(64, 64), hr_size:tuple=(64*3, 64*3)) -> None:
         super().__init__()
         train_dir = os.path.join(root, 'train')
         assert os.path.exists(train_dir)
@@ -58,7 +65,7 @@ class trainDataset(Dataset):
         return lrTensor, hrTensor
 
 class valDataset(Dataset):
-    def __init__(self, root:str, lr_size:tuple=(360, 640), hr_size:tuple=(1080, 1920)) -> None:
+    def __init__(self, root:str, lr_size:tuple=(64, 64), hr_size:tuple=(64*3, 64*3)) -> None:
         super().__init__()
         val_dir = os.path.join(root, 'val')
         assert os.path.exists(val_dir)
