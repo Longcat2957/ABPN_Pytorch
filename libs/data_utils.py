@@ -44,7 +44,7 @@ class trainDataset(Dataset):
         lrPilObj = self.lr_transform(hrPilObj)
         
         hrTensor = self.to_tensor(hrPilObj)
-        lrTensor = self.to_tensor(lrTensor)
+        lrTensor = self.to_tensor(lrPilObj)
         return lrTensor, hrTensor
 
 class valDataset(Dataset):
