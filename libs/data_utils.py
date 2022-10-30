@@ -1,8 +1,18 @@
 import os
 from PIL import Image
 import torch
+import torch.nn as nn
 from torch.utils.data import Dataset
 from torchvision.transforms import *
+
+def saveModel(model:nn.Module, name:str):
+    assert not os.path.exists(name), FileExistsError(f"{name} is exists")
+    torch.save(model.state_dict(), name)
+
+def loadModel(model:nn.Module, weight:str):
+    assert os.path.exists(weight), FileNotFoundError(f"{weight} not found")
+    model.load_state_dict(torch.load(weight))
+    return model
 
 def isImage(filepath):
     try:
