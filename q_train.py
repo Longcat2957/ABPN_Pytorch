@@ -20,7 +20,10 @@ parser.add_argument(
     "--save_interval", type=int, default=30
 )
 parser.add_argument(
-    "--weight", type=str, required=True
+    "--weight", type=str, required=True, help="QAT NEEDS PRE-TRAINED FP32 Weight"
+)
+parser.add_argument(
+    "--q_config", type=str, choices=["qnnpack", "fbgemm", "fbgemm_gpu"], default="qnnpack"
 )
 
 if __name__ == "__main__":
@@ -44,7 +47,7 @@ if __name__ == "__main__":
         print(f"# Load Model .... ")
     except:
         raise ValueError(opt.weight)
-    model = qat_wrapper(model)    # model --> qat_model
+    model = qat_wrapper(model, opt.q_config)    # model --> qat_model
     
     criterion = torch.nn.L1Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, betas=[0.9, 0.999], eps=1e-8)
@@ -83,6 +86,10 @@ if __name__ == "__main__":
         
         if epoch % opt.save_interval == 0:
             print(f"# SAVE WEIGHT")
-            weight_name = f"qat_{epoch}.pth"
+            weight_name = f"qat_{opt.q_config}_{epoch}.pth"
             weight_name = os.path.join("./weights", weight_name)
             saveModel(model, weight_name)
+    print(f"# SAVE FINAL RESULTS ...")
+    weight_name = f"qat_{opt.q_config}_final.pth"
+    weight_name = os.path.join("./weights", weight_name)
+    saveModel(model, weight_name)
