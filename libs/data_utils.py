@@ -21,6 +21,7 @@ def isImage(filepath):
         return False
     return True
 
+
 def openImage(filepath):
     try:
         imgObj = Image.open(filepath)
@@ -44,6 +45,8 @@ class trainDataset(Dataset):
         
         self.hr_transform = Compose([
             RandomCrop(hr_size),
+            RandomHorizontalFlip(),
+            RandomRotation(180)
         ])
         self.lr_transform = Compose([
             Resize(size=lr_size)
@@ -99,6 +102,7 @@ class testDataset(Dataset):
         test_dir = os.path.join(root, 'test')
         assert os.path.exists(test_dir)
         self.file_list = [os.path.join(test_dir, x) for x in os.listdir(test_dir) if isImage(os.path.join(test_dir, x))]
+        self.valid_file_list = []
         self.hr_transform = RandomCrop(size=hr_size)
         self.lr_transform = Resize(size=lr_size)
         self.sr_transform = Resize(size=hr_size)

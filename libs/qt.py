@@ -1,4 +1,4 @@
-from model import edgeSR
+from .model import edgeSR
 import torch
 import torch.nn as nn
 import torch.quantization as tq
@@ -16,7 +16,7 @@ class qatModel(nn.Module):
         x = self.dequant(x)    
         return x
 
-def q_wrapper(model:nn.Module, config:str="qnnpack"):
+def qat_wrapper(model:nn.Module, config:str="qnnpack"):
     model = model.eval()
     for i in range(len(model.feature_extraction)):
         model.feature_extraction[i].fuse_modules()
@@ -25,7 +25,12 @@ def q_wrapper(model:nn.Module, config:str="qnnpack"):
     torch.quantization.prepare_qat(qat_model, inplace=True)
     return qat_model
 
+def qat_q_convert(qat_model, inplace:bool=False):
+    return torch.quantization.convert(qat_model.eval(), inplace=inplace)
+
 if __name__ == "__main__":
+    torch.backends.quantized.engine = "qnnpack"
     model = edgeSR()
-    qat_model = q_wrapper(model)
-    print(qat_model)
+    qat_model = qat_wrapper(model)
+    q_model = torch.quantization.convert(qat_model.eval(), inplace=False)
+    

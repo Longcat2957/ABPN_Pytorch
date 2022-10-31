@@ -13,10 +13,10 @@ parser.add_argument(
     "--batch_size", type=int, default=16
 )
 parser.add_argument(
-    "--epochs", type=int, default=300
+    "--epochs", type=int, default=1000
 )
 parser.add_argument(
-    "--save_interval", type=int, default=5
+    "--save_interval", type=int, default=50
 )
 
 
@@ -39,6 +39,7 @@ if __name__ == "__main__":
     
     criterion = torch.nn.L1Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, betas=[0.9, 0.999], eps=1e-8)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=200, gamma=0.5)
     
     for epoch in range(1, opt.epochs+1):
         # train
@@ -68,9 +69,10 @@ if __name__ == "__main__":
                 ssim_list.append(ssim_value)
             
         psnr_average, ssim_average = getAverage(psnr_list), getAverage(ssim_list)
-        print(f"# VALIDATION RESULTS [{epoch}/{opt.epochs}] : PSNR = {psnr_average:.3f}, SSIM = {ssim_average:.3f}")
+        print(f"# VALIDATION RESULTS [{epoch}/{opt.epochs}] : PSNR = {psnr_average:.5f}, SSIM = {ssim_average:.5f}")
+        scheduler.step()
         
-        if epoch & opt.save_interval == 0:
+        if epoch % opt.save_interval == 0:
             print(f"# SAVE WEIGHT")
             weight_name = f"{epoch}.pth"
             weight_name = os.path.join("./weights", weight_name)
