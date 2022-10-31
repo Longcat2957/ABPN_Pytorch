@@ -28,6 +28,13 @@ def qat_wrapper(model:nn.Module, config:str="qnnpack"):
 def qat_q_convert(qat_model, inplace:bool=False):
     return torch.quantization.convert(qat_model.to(torch.device("cpu")).eval(), inplace=inplace)
 
+def get_q_model(qat_weight:str, config:str="qnnpack"):
+    net = edgeSR()
+    qat_model = qat_wrapper(net, config)
+    qat_model.load_state_dict(torch.load(qat_weight))
+    q_model = qat_q_convert(qat_model)
+    return q_model
+
 if __name__ == "__main__":
     torch.backends.quantized.engine = "qnnpack"
     model = edgeSR()
