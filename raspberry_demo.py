@@ -11,3 +11,4 @@ from libs.qt import get_q_model, qat_wrapper, qat_q_convert
 torch.backends.quantized.engine = "qnnpack"
 QAT_WEIGHT_PATH = "./weights/qat_180.pth"
 q_model = get_q_model(QAT_WEIGHT_PATH)
+print(q_model)
