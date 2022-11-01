@@ -17,12 +17,10 @@ def get_jit_model(weight_path:str):
 
 
 torch.backends.quantized.engine = "qnnpack"
-QAT_WEIGHT_PATH = "./weights/qat_180.pth"
+QAT_WEIGHT_PATH = "./weights/qat_qnnpack_30.pth"
 q_model = get_q_model(QAT_WEIGHT_PATH)
-net = torch.jit.script(q_model)
-torch.jit.save(net, "edgeSR_int8_rasp_jit.pth")
-net = get_jit_model("edgeSR_int8_rasp_jit.pth")
-
+q_model = torch.jit.script(q_model)
+print(q_model)
 preprocess = T.Compose([
     T.CenterCrop(size=(240, 426)),
     T.ToTensor()
@@ -42,4 +40,4 @@ with torch.no_grad():
 print(f"# BENCHMARK (SINGLE IMG) [{time_elapsed * 1000:.3f}ms]")
 
 # SHOW IMG
-output.save("output.jpg", "JPEG")
+output.save("output2.jpg", "JPEG")
