@@ -57,12 +57,12 @@ if __name__ == "__main__":
     model = edgeSR().to(DEVICE)
     model = loadModel(model, FP32_WEIGHT)
     pilObj = Image.open(TEST_IMAGE)
-    # preprocess = T.Compose([
-    #     T.CenterCrop(size=(240, 426)),
-    #     T.ToTensor()
-    # ])
-    # inputTensor = preprocess(pilObj)
-    # inputTensor = inputTensor.unsqueeze(0).to(DEVICE)
+    preprocess = T.Compose([
+        T.CenterCrop(size=(240, 426)),
+        T.ToTensor()
+    ])
+    inputTensor = preprocess(pilObj)
+    inputTensor = inputTensor.unsqueeze(0).to(DEVICE)
     
     # postprocess = T.Compose([
     #     T.ToPILImage()
