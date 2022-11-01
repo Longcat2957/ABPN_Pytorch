@@ -29,29 +29,29 @@ def calculateInferenceTime(model, input):
 
 if __name__ == "__main__":
     print(f"# DEVICE ? : {DEVICE}")
-    model = edgeSR().to(DEVICE)
-    model = loadModel(model, FP32_WEIGHT)
-    pilObj = Image.open(TEST_IMAGE)
-    preprocess = T.Compose([
-        T.CenterCrop(size=(240, 426)),
-        T.ToTensor()
-    ])
-    inputTensor = preprocess(pilObj)
-    inputTensor = inputTensor.unsqueeze(0).to(DEVICE)
-    # fp32 + gpu
-    inputTensor = inputTensor.to(torch.device("cuda"))
-    model.to(torch.device("cuda"))
-    model.eval()
-    with torch.no_grad():
-        pred = model(inputTensor).detach().cpu()
-    fp32_gpu_time = calculateInferenceTime(model, inputTensor)
-    print(f">> fp32 + gpu ::{fp32_gpu_time * 1000:.3f}ms")
+    # model = edgeSR().to(DEVICE)
+    # model = loadModel(model, FP32_WEIGHT)
+    # pilObj = Image.open(TEST_IMAGE)
+    # preprocess = T.Compose([
+    #     T.CenterCrop(size=(240, 426)),
+    #     T.ToTensor()
+    # ])
+    # inputTensor = preprocess(pilObj)
+    # inputTensor = inputTensor.unsqueeze(0).to(DEVICE)
+    # # fp32 + gpu
+    # inputTensor = inputTensor.to(torch.device("cuda"))
+    # model.to(torch.device("cuda"))
+    # model.eval()
+    # with torch.no_grad():
+    #     pred = model(inputTensor).detach().cpu()
+    # fp32_gpu_time = calculateInferenceTime(model, inputTensor)
+    # print(f">> fp32 + gpu ::{fp32_gpu_time * 1000:.3f}ms")
     
-    # fp16 + gpu
-    inputHalfTensor = inputTensor.half().to(torch.device("cuda"))
-    modelHalf = model.half().to(torch.device("cuda"))
-    fp16_gpu_time = calculateInferenceTime(modelHalf, inputHalfTensor)
-    print(f">> fp16 + gpu ::{fp16_gpu_time * 1000:.3f}ms")
+    # # fp16 + gpu
+    # inputHalfTensor = inputTensor.half().to(torch.device("cuda"))
+    # modelHalf = model.half().to(torch.device("cuda"))
+    # fp16_gpu_time = calculateInferenceTime(modelHalf, inputHalfTensor)
+    # print(f">> fp16 + gpu ::{fp16_gpu_time * 1000:.3f}ms")
 
 
     model = edgeSR().to(DEVICE)
@@ -90,6 +90,6 @@ if __name__ == "__main__":
     postprocess = T.Compose([
         T.ToPILImage()
     ])
-    post = postprocess(pred.squeeze(0))
-    post.save("output.jpg", "JPEG")
+    # post = postprocess(pred.squeeze(0))
+    # post.save("output.jpg", "JPEG")
     
