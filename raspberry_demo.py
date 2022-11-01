@@ -23,12 +23,12 @@ net = torch.jit.script(q_model)
 torch.jit.save(net, "edgeSR_int8_rasp_jit.pth")
 net = get_jit_model("edgeSR_int8_rasp_jit.pth")
 
-preprocess = Compose([
-    CenterCrop(size=(240, 426)),
-    ToTensor()
+preprocess = T.Compose([
+    T.CenterCrop(size=(240, 426)),
+    T.ToTensor()
 ])
-postprocess = Compose([
-    ToPILImage()
+postprocess = T.Compose([
+    T.ToPILImage()
 ])
 
 with torch.no_grad():
