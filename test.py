@@ -14,7 +14,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 DEVICE = torch.device("cpu")
 TEST_IMAGE = "./ssd_sample.jpeg"
 FP32_WEIGHT = "./weights/1000.pth"
-QAT_WEIGHT = "./weights/qat_fbgemm_final.pth"
+QAT_WEIGHT = "./weights/qat_180.pth"
 
 def calculateInferenceTime(model, input):
     model = model.eval()
