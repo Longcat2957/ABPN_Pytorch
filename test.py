@@ -71,9 +71,9 @@ if __name__ == "__main__":
     inputTensorToPilObj.save("input.jpg", "JPEG")
     
     
-    # # fp32 + cpu
-    # fp32_cpu_inference_time = calculateInferenceTime(model, inputTensor)
-    # print(f">> fp32 + cpu ::{fp32_cpu_inference_time * 1000:.3f}ms")
+    # fp32 + cpu
+    fp32_cpu_inference_time = calculateInferenceTime(model, inputTensor)
+    print(f">> fp32 + cpu ::{fp32_cpu_inference_time * 1000:.3f}ms")
     
     # qat_model = qat_wrapper(model, config="fbgemm")
     # qat_model.load_state_dict(torch.load(QAT_WEIGHT))
