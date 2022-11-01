@@ -32,7 +32,7 @@ def get_q_model(qat_weight:str, config:str="qnnpack"):
     net = edgeSR()
     qat_model = qat_wrapper(net, config)
     qat_model.load_state_dict(torch.load(qat_weight, map_location=torch.device("cpu")))
-    q_model = qat_q_convert(qat_model)
+    q_model = qat_q_convert(qat_model, inplace=False)
     return q_model
 
 if __name__ == "__main__":

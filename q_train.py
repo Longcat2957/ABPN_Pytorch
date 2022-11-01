@@ -28,6 +28,7 @@ parser.add_argument(
 
 if __name__ == "__main__":
     opt = parser.parse_args()
+    torch.backends.quantized.engine = opt.q_config
     DEVICE = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     print(f"# DEVICE = {DEVICE}")
     traindataset = trainDataset(DATA_ROOT)
