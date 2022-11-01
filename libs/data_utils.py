@@ -9,9 +9,9 @@ def saveModel(model:nn.Module, name:str):
     assert not os.path.exists(name), FileExistsError(f"{name} is exists")
     torch.save(model.state_dict(), name)
 
-def loadModel(model:nn.Module, weight:str):
+def loadModel(model:nn.Module, weight:str, device:str='cpu'):
     assert os.path.exists(weight), FileNotFoundError(f"{weight} not found")
-    model.load_state_dict(torch.load(weight))
+    model.load_state_dict(torch.load(weight, map_location=torch.device(device)))
     return model
 
 def isImage(filepath):
