@@ -20,7 +20,8 @@ postprocess = T.Compose([
 # without quantization
 FP32_WEIGHT = "./weights/1000.pth"
 net = edgeSR()
-net = net.load_state_dict(torch.load(FP32_WEIGHT, map_location=torch.device("cpu")))
+net.load_state_dict(torch.load(FP32_WEIGHT, map_location=torch.device("cpu")))
+net.eval()
 
 with torch.no_grad():
     img = Image.open("input.jpeg")
