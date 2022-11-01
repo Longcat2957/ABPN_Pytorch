@@ -18,21 +18,21 @@ postprocess = T.Compose([
 ])
 
 # without quantization
-FP32_WEIGHT = "./weights/1000.pth"
-net = edgeSR()
-net.load_state_dict(torch.load(FP32_WEIGHT, map_location=torch.device("cpu")))
-net.eval()
+# FP32_WEIGHT = "./weights/1000.pth"
+# net = edgeSR()
+# net.load_state_dict(torch.load(FP32_WEIGHT, map_location=torch.device("cpu")))
+# net.eval()
 
-with torch.no_grad():
-    img = Image.open("input.jpeg")
-    started = time.time()
-    permuted = preprocess(img).unsqueeze(0)
-    pred = net(permuted)
-    time_elapsed = time.time() - started
-    output = postprocess(pred.squeeze(0))
+# with torch.no_grad():
+#     img = Image.open("input.jpeg")
+#     started = time.time()
+#     permuted = preprocess(img).unsqueeze(0)
+#     pred = net(permuted)
+#     time_elapsed = time.time() - started
+#     output = postprocess(pred.squeeze(0))
 
 
-print(f"# BENCHMARK (SINGLE IMG) with fp32 [{time_elapsed * 1000:.3f}ms]")
+# print(f"# BENCHMARK (SINGLE IMG) with fp32 [{time_elapsed * 1000:.3f}ms]")
 
 # with quantization
 def get_jit_model(weight_path:str):
@@ -44,9 +44,9 @@ def get_jit_model(weight_path:str):
 
 
 torch.backends.quantized.engine = "qnnpack"
-QAT_WEIGHT_PATH = "./weights/qat_qnnpack_30.pth"
+QAT_WEIGHT_PATH = "./weights/qat_qnnpack_final.pth"
 q_model = get_q_model(QAT_WEIGHT_PATH)
-q_model = torch.jit.script(q_model)
+# q_model = torch.jit.script(q_model)
 
 
 with torch.no_grad():
