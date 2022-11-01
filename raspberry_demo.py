@@ -35,7 +35,7 @@ with torch.no_grad():
     img = Image.open("input.jpeg")
     started = time.time()
     permuted = preprocess(img).unsqueeze(0)
-    pred = net(permuted)
+    pred = q_model(permuted)
     time_elapsed = time.time() - started
     output = postprocess(pred.squeeze(0))
 
