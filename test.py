@@ -57,39 +57,39 @@ if __name__ == "__main__":
     model = edgeSR().to(DEVICE)
     model = loadModel(model, FP32_WEIGHT)
     pilObj = Image.open(TEST_IMAGE)
-    preprocess = T.Compose([
-        T.CenterCrop(size=(240, 426)),
-        T.ToTensor()
-    ])
-    inputTensor = preprocess(pilObj)
-    inputTensor = inputTensor.unsqueeze(0).to(DEVICE)
+    # preprocess = T.Compose([
+    #     T.CenterCrop(size=(240, 426)),
+    #     T.ToTensor()
+    # ])
+    # inputTensor = preprocess(pilObj)
+    # inputTensor = inputTensor.unsqueeze(0).to(DEVICE)
     
-    postprocess = T.Compose([
-        T.ToPILImage()
-    ])
-    inputTensorToPilObj = postprocess(inputTensor.squeeze(0))
-    inputTensorToPilObj.save("input.jpg", "JPEG")
+    # postprocess = T.Compose([
+    #     T.ToPILImage()
+    # ])
+    # inputTensorToPilObj = postprocess(inputTensor.squeeze(0))
+    # inputTensorToPilObj.save("input.jpg", "JPEG")
     
     
-    # fp32 + cpu
-    fp32_cpu_inference_time = calculateInferenceTime(model, inputTensor)
-    print(f">> fp32 + cpu ::{fp32_cpu_inference_time * 1000:.3f}ms")
+    # # fp32 + cpu
+    # fp32_cpu_inference_time = calculateInferenceTime(model, inputTensor)
+    # print(f">> fp32 + cpu ::{fp32_cpu_inference_time * 1000:.3f}ms")
     
-    qat_model = qat_wrapper(model, config="fbgemm")
-    qat_model.load_state_dict(torch.load(QAT_WEIGHT))
-    # qat + cpu
-    qat_inference_time = calculateInferenceTime(qat_model, inputTensor)
-    print(f">> fake int8 + cpu :: {qat_inference_time * 1000:.3f}ms")
+    # qat_model = qat_wrapper(model, config="fbgemm")
+    # qat_model.load_state_dict(torch.load(QAT_WEIGHT))
+    # # qat + cpu
+    # qat_inference_time = calculateInferenceTime(qat_model, inputTensor)
+    # print(f">> fake int8 + cpu :: {qat_inference_time * 1000:.3f}ms")
     
-    # q + cpu
-    q_model = qat_q_convert(qat_model, inplace=False)
-    q_time = calculateInferenceTime(q_model, inputTensor)
-    print(f">> int8 + cpu :: {q_time * 1000:.3f}ms")
+    # # q + cpu
+    # q_model = qat_q_convert(qat_model, inplace=False)
+    # q_time = calculateInferenceTime(q_model, inputTensor)
+    # print(f">> int8 + cpu :: {q_time * 1000:.3f}ms")
     
-    # Save results
-    postprocess = T.Compose([
-        T.ToPILImage()
-    ])
+    # # Save results
+    # postprocess = T.Compose([
+    #     T.ToPILImage()
+    # ])
     # post = postprocess(pred.squeeze(0))
     # post.save("output.jpg", "JPEG")
     
