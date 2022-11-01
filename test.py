@@ -72,11 +72,11 @@ if __name__ == "__main__":
     
     
     # fp32 + cpu
-    fp32_cpu_inference_time = calculateInferenceTime(model, inputTensor)
-    print(f">> fp32 + cpu ::{fp32_cpu_inference_time * 1000:.3f}ms")
+    # fp32_cpu_inference_time = calculateInferenceTime(model, inputTensor)
+    # print(f">> fp32 + cpu ::{fp32_cpu_inference_time * 1000:.3f}ms")
     
-    # qat_model = qat_wrapper(model, config="fbgemm")
-    # qat_model.load_state_dict(torch.load(QAT_WEIGHT))
+    qat_model = qat_wrapper(model, config="qnnpack")
+    qat_model.load_state_dict(torch.load(QAT_WEIGHT, map_location="cpu"))
     # # qat + cpu
     # qat_inference_time = calculateInferenceTime(qat_model, inputTensor)
     # print(f">> fake int8 + cpu :: {qat_inference_time * 1000:.3f}ms")
