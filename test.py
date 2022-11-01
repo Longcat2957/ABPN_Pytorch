@@ -64,11 +64,11 @@ if __name__ == "__main__":
     inputTensor = preprocess(pilObj)
     inputTensor = inputTensor.unsqueeze(0).to(DEVICE)
     
-    # postprocess = T.Compose([
-    #     T.ToPILImage()
-    # ])
-    # inputTensorToPilObj = postprocess(inputTensor.squeeze(0))
-    # inputTensorToPilObj.save("input.jpg", "JPEG")
+    postprocess = T.Compose([
+        T.ToPILImage()
+    ])
+    inputTensorToPilObj = postprocess(inputTensor.squeeze(0))
+    inputTensorToPilObj.save("input.jpg", "JPEG")
     
     
     # # fp32 + cpu
