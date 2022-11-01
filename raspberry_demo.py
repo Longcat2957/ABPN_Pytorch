@@ -44,8 +44,10 @@ def get_jit_model(weight_path:str):
 
 
 torch.backends.quantized.engine = "qnnpack"
-QAT_WEIGHT_PATH = "./weights/qat_qnnpack_final.pth"
-q_model = get_q_model(QAT_WEIGHT_PATH)
+net=edgeSR()
+net.load_state_dict(torch.load("./weights/1000.pth", map_location=torch.device("cpu")))
+qat_model = qat_wrapper(net)
+q_model = qat_q_convert(qat_model)
 # q_model = torch.jit.script(q_model)
 
 
