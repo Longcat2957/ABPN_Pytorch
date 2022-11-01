@@ -31,7 +31,7 @@ def qat_q_convert(qat_model, inplace:bool=False):
 def get_q_model(qat_weight:str, config:str="qnnpack"):
     net = edgeSR()
     qat_model = qat_wrapper(net, config)
-    qat_model.load_state_dict(torch.load(qat_weight))
+    qat_model.load_state_dict(torch.load(qat_weight, map_location=torch.device("cpu")))
     q_model = qat_q_convert(qat_model)
     return q_model
 
