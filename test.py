@@ -78,8 +78,8 @@ if __name__ == "__main__":
     qat_model = qat_wrapper(model, config="qnnpack")
     qat_model.load_state_dict(torch.load(QAT_WEIGHT, map_location="cpu"))
     # # qat + cpu
-    # qat_inference_time = calculateInferenceTime(qat_model, inputTensor)
-    # print(f">> fake int8 + cpu :: {qat_inference_time * 1000:.3f}ms")
+    qat_inference_time = calculateInferenceTime(qat_model, inputTensor)
+    print(f">> fake int8 + cpu :: {qat_inference_time * 1000:.3f}ms")
     
     # # q + cpu
     # q_model = qat_q_convert(qat_model, inplace=False)
