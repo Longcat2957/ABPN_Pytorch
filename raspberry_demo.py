@@ -44,7 +44,7 @@ def get_jit_model(weight_path:str):
 
 
 torch.backends.quantized.engine = "qnnpack"
-QAT_WEIGHT_PATH = "./weights/qat_qnnpack_final.pth"
+QAT_WEIGHT_PATH = "./weights/qat_qnnpack_90.pth"
 q_model = get_q_model(QAT_WEIGHT_PATH)
 # q_model = torch.jit.script(q_model)
 
