@@ -52,12 +52,17 @@ def getAverage(List:list):
     return summation / length
 
 class trainDataset(Dataset):
-    def __init__(self, root:str, lr_size:tuple=(64, 64), hr_size:tuple=(64*3, 64*3)) -> None:
+    def __init__(self, root:str, lr_size:tuple=(64, 64), hr_size:tuple=(64*3, 64*3), \
+        preload:bool=True) -> None:
         super().__init__()
         train_dir = os.path.join(root, 'train')
         assert os.path.exists(train_dir)
         self.file_list = [os.path.join(train_dir, x) for x in os.listdir(train_dir) if isImage(os.path.join(train_dir, x))]
-        
+        self.preload = preload
+        if preload:
+            self.preloaded = [npToTensor(openImage(x)) for x in self.file_list]
+        else:
+            self.preloaded = None
         self.hr_transform = Compose([
             RandomCrop(hr_size),
             RandomHorizontalFlip(),
@@ -71,9 +76,11 @@ class trainDataset(Dataset):
         return len(self.file_list)
 
     def __getitem__(self, idx:int) -> tuple:
-        # return lr(tensor), hr(tensor)
-        origImgObj = openImage(self.file_list[idx]) # origImgObj is np.ndarray
-        origImgTensor = npToTensor(origImgObj)      #
+        if self.preload:
+            origImgTensor = self.preloaded[idx]
+        else:
+            origImgObj = openImage(self.file_list[idx]) # origImgObj is np.ndarray
+            origImgTensor = npToTensor(origImgObj)      #
         
         hrTensor = self.hr_transform(origImgTensor)
         lrTensor = self.lr_transform(hrTensor)
@@ -81,12 +88,16 @@ class trainDataset(Dataset):
         return lrTensor.float(), hrTensor.float()
 
 class valDataset(Dataset):
-    def __init__(self, root:str, lr_size:tuple=(64, 64), hr_size:tuple=(64*3, 64*3)) -> None:
+    def __init__(self, root:str, lr_size:tuple=(64, 64), hr_size:tuple=(64*3, 64*3), preload:bool=True) -> None:
         super().__init__()
         val_dir = os.path.join(root, 'val')
         assert os.path.exists(val_dir)
         self.file_list = [os.path.join(val_dir, x) for x in os.listdir(val_dir) if isImage(os.path.join(val_dir, x))]
-        
+        self.preload = preload
+        if preload:
+            self.preloaded = [npToTensor(openImage(x)) for x in self.file_list]
+        else:
+            self.preloaded = None
         self.hr_transform = Compose([
             CenterCrop(size=hr_size)
         ])
@@ -98,9 +109,11 @@ class valDataset(Dataset):
         return len(self.file_list)
     
     def __getitem__(self, idx) -> tuple:
-        # return lr(tensor), hr(tensor)
-        origImgObj = openImage(self.file_list[idx])
-        origImgTensor = npToTensor(origImgObj)
+        if self.preload:
+            origImgTensor = self.preloaded[idx]
+        else:
+            origImgObj = openImage(self.file_list[idx]) # origImgObj is np.ndarray
+            origImgTensor = npToTensor(origImgObj)      
         
         hrTensor = self.hr_transform(origImgTensor)
         lrTensor = self.lr_transform(hrTensor)

@@ -11,6 +11,9 @@ from libs.model import edgeSR
 DATA_ROOT = "../data/"
 parser = argparse.ArgumentParser()
 parser.add_argument(
+    "--preload", type=bool, default=True
+)
+parser.add_argument(
     "--batch_size", type=int, default=16
 )
 parser.add_argument(
@@ -25,8 +28,8 @@ if __name__ == "__main__":
     opt = parser.parse_args()
     DEVICE = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     print(f"# DEVICE = {DEVICE}")
-    traindataset = trainDataset(DATA_ROOT)
-    valdataset = valDataset(DATA_ROOT)
+    traindataset = trainDataset(DATA_ROOT, preload=opt.preload)
+    valdataset = valDataset(DATA_ROOT, preload=opt.preload)
     print(f"# TRAIN DATASET = {len(traindataset)}")
     print(f"# VALID DATASET = {len(valdataset)}")
     trainloader = DataLoader(
@@ -75,17 +78,6 @@ if __name__ == "__main__":
         print(f"# VALIDATION RESULTS [{epoch}/{opt.epochs}] : PSNR = {psnr_average:.5f}, SSIM = {ssim_average:.5f}")
         scheduler.step()
         
-        # save test_result
-        if epoch % 10 == 0:
-            model.eval()
-            pilObj = Image.open("ms3_01.png")
-            pre = ToTensor()
-            post = ToPILImage()
-            testTensor = pre(pilObj).unsqueeze(0).to(DEVICE)
-            with torch.no_grad():
-                srTensor = model(testTensor).squeeze(0).cpu()
-            srPilObj = post(srTensor)
-            srPilObj.save(f"output_{epoch}.jpg", "JPEG")
         
         if epoch % opt.save_interval == 0:
             print(f"# SAVE WEIGHT")
