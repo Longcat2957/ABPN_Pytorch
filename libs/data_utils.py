@@ -1,4 +1,6 @@
 import os
+import cv2
+import numpy as np
 from PIL import Image
 import torch
 import torch.nn as nn
@@ -22,13 +24,26 @@ def isImage(filepath):
     return True
 
 
+# def openImage(filepath):
+#     try:
+#         imgObj = Image.open(filepath)
+#         return imgObj
+#     except:
+#         raise ValueError()
+
 def openImage(filepath):
     try:
-        imgObj = Image.open(filepath)
+        imgObj = cv2.imread(filepath, cv2.IMREAD_COLOR)
+        imgObj = cv2.cvtColor(imgObj, cv2.COLOR_BGR2RGB)
         return imgObj
     except:
         raise ValueError()
-    
+
+def npToTensor(x:np.ndarray):
+    x = np.transpose(x, [2, 0, 1])
+    tensor = torch.from_numpy(x)
+    return tensor
+
 def getAverage(List:list):
     length = len(List)
     summation = 0.
@@ -51,21 +66,19 @@ class trainDataset(Dataset):
         self.lr_transform = Compose([
             Resize(size=lr_size)
         ])
-        self.to_tensor = ToTensor()
         
     def __len__(self):
         return len(self.file_list)
 
     def __getitem__(self, idx:int) -> tuple:
         # return lr(tensor), hr(tensor)
-        origImgObj = openImage(self.file_list[idx])
+        origImgObj = openImage(self.file_list[idx]) # origImgObj is np.ndarray
+        origImgTensor = npToTensor(origImgObj)      #
         
-        hrPilObj = self.hr_transform(origImgObj)
-        lrPilObj = self.lr_transform(hrPilObj)
+        hrTensor = self.hr_transform(origImgTensor)
+        lrTensor = self.lr_transform(hrTensor)
         
-        hrTensor = self.to_tensor(hrPilObj)
-        lrTensor = self.to_tensor(lrPilObj)
-        return lrTensor, hrTensor
+        return lrTensor.float(), hrTensor.float()
 
 class valDataset(Dataset):
     def __init__(self, root:str, lr_size:tuple=(64, 64), hr_size:tuple=(64*3, 64*3)) -> None:
@@ -80,7 +93,6 @@ class valDataset(Dataset):
         self.lr_transform = Compose([
             Resize(size=lr_size)
         ])
-        self.to_tensor = ToTensor()
     
     def __len__(self):
         return len(self.file_list)
@@ -88,13 +100,12 @@ class valDataset(Dataset):
     def __getitem__(self, idx) -> tuple:
         # return lr(tensor), hr(tensor)
         origImgObj = openImage(self.file_list[idx])
+        origImgTensor = npToTensor(origImgObj)
         
-        hrPilObj = self.hr_transform(origImgObj)
-        lrPilObj = self.lr_transform(hrPilObj)
-        
-        hrTensor = self.to_tensor(hrPilObj)
-        lrTensor = self.to_tensor(lrPilObj)
-        return lrTensor, hrTensor
+        hrTensor = self.hr_transform(origImgTensor)
+        lrTensor = self.lr_transform(hrTensor)
+
+        return lrTensor.float(), hrTensor.float()
     
 class testDataset(Dataset):
     def __init__(self, root:str, lr_size:tuple=(360, 640), hr_size:tuple=(1080, 1920)) -> None:
@@ -118,3 +129,15 @@ class testDataset(Dataset):
         lrImgObj = self.lr_transform(hrImgObj)
         srImgObj = self.sr_transform(lrImgObj)
         return self.to_tensor(lrImgObj), self.to_tensor(srImgObj), self.to_tensor(hrImgObj)
+    
+    
+if __name__ == "__main__":
+    imgpath = "../ms3_01.png"
+    imgObj = openImage(imgpath)
+    # while True:
+    #     cv2.imshow("read?", cv2.cvtColor(imgObj, cv2.COLOR_RGB2BGR))
+    #     key = cv2.waitKey(1)
+    #     if key == 27:
+    #         break
+    # cv2.destroyAllWindows()
+    imgTensor = npToTensor(imgObj)

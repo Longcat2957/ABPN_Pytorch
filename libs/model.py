@@ -35,8 +35,18 @@ class Clip(nn.Module):
         super().__init__()
         
     def forward(self, x):
-        return torch.clip(x, min=0., max=255.)
+        return torch.clip(x, min=-128, max=127)
 
+class DepthToSpace(nn.Module):
+    def __init__(self, block_size:int=3):
+        super().__init__()
+        self.block_size = block_size
+    
+    def forward(self, x):
+        n, c, h, w = x.size()
+        return x.view(n, c//self.block_size**2, h * self.block_size, w * self.block_size)
+
+        
 class edgeSR(nn.Module):
     def __init__(self):
         super().__init__()
@@ -53,6 +63,7 @@ class edgeSR(nn.Module):
         )
         self.add = nn.quantized.FloatFunctional()
         self.depth_to_space = nn.PixelShuffle(upscale_factor=3)
+        #self.depth_to_space = DepthToSpace()
         self.clip = Clip()
         self.final_act = nn.ReLU()
     def forward(self, lr):
@@ -78,3 +89,17 @@ if __name__ == "__main__":
     lr = torch.randn(size=(1, 3, 360, 640))
     hr = fullmodel(lr)
     print(hr.shape)
+    
+    x = [[1], [2], [3], [4]]
+    x = torch.Tensor(x).unsqueeze(dim=-1).unsqueeze(0)
+    print(x.shape)
+    dts = DepthToSpace(2)
+    y = dts(x)
+    print(y.shape)
+    print(y)
+    
+    ps = nn.PixelShuffle(2)
+    y2 = ps(x)
+    print(y2)
+    
+    

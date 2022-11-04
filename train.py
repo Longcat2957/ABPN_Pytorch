@@ -2,6 +2,7 @@ import os
 import argparse
 
 from tqdm import tqdm
+from torchvision.transforms import ToTensor, ToPILImage
 from torchmetrics.functional import peak_signal_noise_ratio, structural_similarity_index_measure
 from torch.utils.data import DataLoader
 from libs.data_utils import *
@@ -29,10 +30,12 @@ if __name__ == "__main__":
     print(f"# TRAIN DATASET = {len(traindataset)}")
     print(f"# VALID DATASET = {len(valdataset)}")
     trainloader = DataLoader(
-        traindataset, batch_size = opt.batch_size, shuffle=True, num_workers=os.cpu_count() - 2
+        traindataset, batch_size = opt.batch_size, shuffle=True, num_workers=os.cpu_count() - 2,
+        pin_memory=True
     )
     valloader = DataLoader(
-        valdataset, batch_size = opt.batch_size, shuffle=False, num_workers=os.cpu_count() - 2
+        valdataset, batch_size = opt.batch_size, shuffle=False, num_workers=os.cpu_count() - 2,
+        pin_memory=True
     )
     model = edgeSR()
     model.to(DEVICE)
@@ -72,8 +75,20 @@ if __name__ == "__main__":
         print(f"# VALIDATION RESULTS [{epoch}/{opt.epochs}] : PSNR = {psnr_average:.5f}, SSIM = {ssim_average:.5f}")
         scheduler.step()
         
+        # save test_result
+        if epoch % 10 == 0:
+            model.eval()
+            pilObj = Image.open("ms3_01.png")
+            pre = ToTensor()
+            post = ToPILImage()
+            testTensor = pre(pilObj).unsqueeze(0).to(DEVICE)
+            with torch.no_grad():
+                srTensor = model(testTensor).squeeze(0).cpu()
+            srPilObj = post(srTensor)
+            srPilObj.save(f"output_{epoch}.jpg", "JPEG")
+        
         if epoch % opt.save_interval == 0:
             print(f"# SAVE WEIGHT")
-            weight_name = f"{epoch}.pth"
+            weight_name = f"{epoch}_dts.pth"
             weight_name = os.path.join("./weights", weight_name)
             saveModel(model, weight_name)
