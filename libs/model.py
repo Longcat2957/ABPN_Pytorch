@@ -35,7 +35,7 @@ class Clip(nn.Module):
         super().__init__()
         
     def forward(self, x):
-        return torch.clip(x, min=-128, max=127)
+        return torch.clip(x, min=0, max=255)
 
 class DepthToSpace(nn.Module):
     def __init__(self, block_size:int=3):
