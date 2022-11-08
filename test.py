@@ -13,24 +13,24 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 
-DEVICE = torch.device("cpu")
 TEST_IMAGE = "./results/ms3_01.png"
 FP32_WEIGHT = "./weights/1000_dts.pth"
-QAT_WEIGHT = "./weights/qat_fbgemm_100.pth"
 
 def calculateInferenceTime(model, input):
     model = model.eval()
     with torch.no_grad():
-        for i in range(10):
+        for _ in range(50):
             o = model(input)
-    start = time.time()
+    
+    times = []
     with torch.no_grad():
-        o = model(input)
-        end = time.time()
-    return end - start
-
+        for _ in range(100):
+            start = time.time()
+            o = model(input)
+            times.append(time.time() - start)
+    
+    return np.mean(times)
 if __name__ == "__main__":
-    print(f"# DEVICE ? : {DEVICE}")
     fp32_model = edgeSR()
     fp32_model.load_state_dict(torch.load(FP32_WEIGHT, map_location="cpu"))
     fp32_model = fp32_model.cuda()
@@ -47,3 +47,12 @@ if __name__ == "__main__":
             break
         
     cv2.destroyAllWindows()
+    a = calculateInferenceTime(fp32_model, imgTensor)
+    print(f"# FP32 INFERENCE TIME = {a * 1000:.3f}ms")
+    
+    fp16_model = fp32_model.half()
+    fp16_model = fp16_model.eval()
+    imgTensor = npToTensor(openImage(TEST_IMAGE)).unsqueeze(0).half().cuda()
+    
+    b = calculateInferenceTime(fp16_model, imgTensor)
+    print(f"# FP16 INFERENCE TIME = {b * 1000:.3f}ms")
